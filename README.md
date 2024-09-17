@@ -1,117 +1,189 @@
-# ![CI logo](https://codeinstitute.s3.amazonaws.com/fullstack/ci_logo_small.png)
+<h2>Table of Contents</h2>
+<ol>
+    <li><a href="#dataset-content">Dataset Content</a></li>
+    <li><a href="#business-requirements">Business Requirements</a></li>
+    <li><a href="#hypothesis-and-validation">Hypothesis and Validation</a></li>
+    <li><a href="#the-rationale-for-the-model">The Rationale for the Model</a></li>
+    <li><a href="#trial-and-error">Trial and Error</a></li>
+    <li><a href="#implementation-of-the-business-requirements">Implementation of the Business Requirements</a></li>
+    <li><a href="#ml-business-case">ML Business Case</a></li>
+    <li><a href="#dashboard-design-streamlit-app-user-interface">Dashboard Design</a></li>
+    <li><a href="#crisp-dm-process">CRISP-DM Process</a></li>
+    <li><a href="#bugs">Bugs</a></li>
+    <li><a href="#deployment">Deployment</a></li>
+    <li><a href="#technologies-used">Technologies Used</a></li>
+    <li><a href="#credits">Credits</a></li>
+</ol>
 
-## Template Instructions
+<h2 id="dataset-content">Dataset Content</h2>
+<p>The dataset was collected from Kaggle: <a href="https://www.kaggle.com/datasets/codeinstitute/cherry-leaves">Cherry Leaves Dataset</a>. It contains 4,208 images of cherry leaves against a neutral background. The primary feature of the dataset is that the leaves are either healthy or infected. The data was gathered by the client who took pictures of their leaves from their farm.</p>
 
-Welcome,
+<h2 id="business-requirements">Business Requirements</h2>
+<p>Our client requires a machine learning system to help them assess the health of their trees. This system should accurately differentiate between healthy and powdery mildew-infected leaves. It should allow the client to upload images for the system to render and determine if the leaf is infected or not.</p>
 
-This is the Code Institute student template for the Cherry Leaves project option in Predictive Analytics. We have preinstalled all of the tools you need to get started. It's perfectly okay to use this template as the basis for your project submissions. Click the `Use this template` button above to get started.
+<h2 id="hypothesis-and-validation">Hypothesis and Validation</h2>
 
-You can safely delete the Template Instructions section of this README.md file and modify the remaining paragraphs for your own project. Please do read the Template Instructions at least once, though! It contains some important information about the IDE and the extensions we use.
+<h3>Hypothesis 1</h3>
 
-## How to use this repo
+<h4>Introduction</h4>
+<p>We hypothesize that leaves infected with powdery mildew exhibit distinct signs of infection, such as lightening and visible marks.</p>
 
-1. Use this template to create your GitHub project repo
+<h4>Observation</h4>
+<p>Tests showed a clear distinction between healthy and infected leaves using RGB analysis.</p>
 
-1. Log into your cloud IDE with your GitHub account.
+<h4>Conclusion</h4>
+<p>It is plausible to differentiate between healthy and infected leaves with a machine learning model using a softmax function.</p>
 
-1. On your Dashboard, click on the New Workspace button
+<h4>Sources:</h4>
+<ul>
+    <li><a href="https://pnwhandbooks.org/plantdisease/host-disease/cherry-prunus-spp-powdery-mildew">Pacific Northwest Pest Management Handbooks</a></li>
+    <li><a href="https://iq.opengenus.org/calculate-mean-and-std-of-image-dataset/">Calculate Mean and STD of Image Dataset</a></li>
+    <li><a href="https://kozodoi.me/python/deep%20learning/pytorch/tutorial/2021/03/08/image-mean-std.html">Computing Mean & STD in Image Dataset</a></li>
+</ul>
 
-1. Paste in the URL you copied from GitHub earlier
+<h2 id="the-rationale-for-the-model">The Rationale for the Model</h2>
 
-1. Click Create
+<h3>The Goal</h3>
+<p>To build a model that accurately classifies cherry leaves as healthy or infected with powdery mildew.</p>
 
-1. Wait for the workspace to open. This can take a few minutes.
+<h3>Choosing the Hyperparameters</h3>
+<ul>
+    <li><strong>Convolutional Layer Size:</strong> 32, 64, 64</li>
+    <li><strong>Convolutional Kernel Size:</strong> (3, 3)</li>
+    <li><strong>Number of Neurons:</strong> 128</li>
+    <li><strong>Activation Function:</strong> ReLU for hidden layers, Sigmoid for output</li>
+    <li><strong>Pooling:</strong> MaxPooling</li>
+    <li><strong>Output Activation Function:</strong> Sigmoid</li>
+    <li><strong>Dropout:</strong> 0.5</li>
+</ul>
 
-1. Open a new terminal and `pip3 install -r requirements.txt`
+<h4>Sources:</h4>
+<ul>
+    <li><a href="https://medium.com/analytics-vidhya/how-to-choose-the-size-of-the-convolution-filter-or-kernel-size-for-cnn-86a55a1e2d15">How to choose the size of the convolution filter or Kernel size for CNN?</a></li>
+    <li><a href="https://stats.stackexchange.com/questions/126238/what-are-the-advantages-of-relu-over-sigmoid-function-in-deep-neural-networks#:~:text=The%20main%20reason%20why%20ReLu,deep%20network%20with%20sigmoid%20activation.">The advantages of ReLU</a></li>
+    <li><a href="https://medium.com/@bdhuma/which-pooling-method-is-better-maxpooling-vs-minpooling-vs-average-pooling-95fb03f45a9#:~:text=Average%20pooling%20method%20smooths%20out,lighter%20pixels%20of%20the%20image.">Maxpooling vs minpooling vs average pooling</a></li>
+    <li><a href="https://www.baeldung.com/cs/ml-relu-dropout-layers">How ReLU and Dropout Layers Work in CNNs</a></li>
+</ul>
 
-1. Open the jupyter_notebooks directory, and click on the notebook you want to open.
+<h3>Hidden Layers</h3>
+<p>Convolutional layers are used for feature extraction, while fully connected layers are used for classification.</p>
 
-1. Click the kernel button and choose Python Environments.
+<h4>Sources:</h4>
+<ul>
+    <li><a href="https://datascience.stackexchange.com/questions/85582/dense-layer-vs-convolutional-layer-when-to-use-them-and-how#:~:text=As%20known%2C%20the%20main%20difference,function%20based%20on%20every%20input.">Dense Layer vs Convolutional Layer</a></li>
+</ul>
 
-Note that the kernel says Python 3.8.18 as it inherits from the workspace, so it will be Python-3.8.18 as installed by our template. To confirm this, you can use `! python --version` in a notebook code cell.
+<h3>Model Compilation</h3>
+<ul>
+    <li><strong>Loss:</strong> Binary Crossentropy</li>
+    <li><strong>Optimizer:</strong> Adam</li>
+    <li><strong>Metrics:</strong> Accuracy</li>
+</ul>
 
-## Cloud IDE Reminders
+<h4>Sources:</h4>
+<ul>
+    <li><a href="https://www.tensorflow.org/guide/keras/train_and_evaluate">Understanding Loss and Optimizers</a></li>
+</ul>
 
-To log into the Heroku toolbelt CLI:
+<h2 id="trial-and-error">Trial and Error</h2>
+<p>The model was trained for 10 epochs, and its performance was monitored through accuracy and loss metrics. The model achieved high accuracy on both training and validation datasets, indicating a well-performing classification model.</p>
 
-1. Log in to your Heroku account and go to _Account Settings_ in the menu under your avatar.
-2. Scroll down to the _API Key_ and click _Reveal_
-3. Copy the key
-4. In the terminal, run `heroku_config`
-5. Paste in your API key when asked
+<h2 id="implementation-of-the-business-requirements">Implementation of the Business Requirements</h2>
+<p>The business requirements were mapped into several user stories and translated into machine learning tasks. All tasks were manually tested and function as expected.</p>
 
-You can now use the `heroku` CLI program - try running `heroku apps` to confirm it works. This API key is unique and private to you, so do not share it. If you accidentally make it public, then you can create a new one with _Regenerate API Key_.
+<h3>Business Requirement 1: Data Visualization</h3>
+<p><strong>User Story:</strong> To visualize the data and understand the distribution of healthy and infected leaves.</p>
 
-## Dataset Content
+<h3>Business Requirement 2: Classification</h3>
+<p><strong>User Story:</strong> To classify leaves as healthy or infected using the trained model.</p>
 
-- The dataset is sourced from [Kaggle](https://www.kaggle.com/codeinstitute/cherry-leaves). We then created a fictitious user story where predictive analytics can be applied in a real project in the workplace.
-- The dataset contains +4 thousand images taken from the client's crop fields. The images show healthy cherry leaves and cherry leaves that have powdery mildew, a fungal disease that affects many plant species. The cherry plantation crop is one of the finest products in their portfolio, and the company is concerned about supplying the market with a compromised quality product.
+<h3>Business Requirement 3: Report</h3>
+<p><strong>User Story:</strong> To generate a report on model performance and predictions.</p>
 
-## Business Requirements
+<h2 id="ml-business-case">ML Business Case</h2>
+<p>The model classifies cherry leaves as either healthy or infected with powdery mildew. It helps in identifying and managing the health of cherry trees more effectively.</p>
 
-The cherry plantation crop from Farmy & Foods is facing a challenge where their cherry plantations have been presenting powdery mildew. Currently, the process is manual verification if a given cherry tree contains powdery mildew. An employee spends around 30 minutes in each tree, taking a few samples of tree leaves and verifying visually if the leaf tree is healthy or has powdery mildew. If there is powdery mildew, the employee applies a specific compound to kill the fungus. The time spent applying this compound is 1 minute. The company has thousands of cherry trees located on multiple farms across the country. As a result, this manual process is not scalable due to the time spent in the manual process inspection.
+<h2 id="dashboard-design-streamlit-app-user-interface">Dashboard Design (Streamlit App User Interface)</h2>
 
-To save time in this process, the IT team suggested an ML system that detects instantly, using a leaf tree image, if it is healthy or has powdery mildew. A similar manual process is in place for other crops for detecting pests, and if this initiative is successful, there is a realistic chance to replicate this project for all other crops. The dataset is a collection of cherry leaf images provided by Farmy & Foods, taken from their crops.
+<h3>Page 1: Quick Project Summary</h3>
+<p>Provides an overview of the project and its objectives.</p>
 
-- 1 - The client is interested in conducting a study to visually differentiate a healthy cherry leaf from one with powdery mildew.
-- 2 - The client is interested in predicting if a cherry leaf is healthy or contains powdery mildew.
+<h3>Page 2: Leaves Visualizer</h3>
+<p>Allows users to upload and visualize leaf images.</p>
 
-## Hypothesis and how to validate?
+<h3>Page 3: Powdery Mildew Detector</h3>
+<p>Displays results from the model indicating whether a leaf is infected or not.</p>
 
-- List here your project hypothesis(es) and how you envision validating it (them).
+<h3>Page 4: Project Hypothesis and Validation</h3>
+<p>Summarizes the hypotheses tested and their validation results.</p>
 
-## The rationale to map the business requirements to the Data Visualisations and ML tasks
+<h3>Page 5: ML Performance Metrics</h3>
+<p>Shows the performance metrics of the trained model.</p>
 
-- List your business requirements and a rationale to map them to the Data Visualisations and ML tasks.
+<h2 id="crisp-dm-process">CRISP-DM Process</h2>
+<p>The Cross-Industry Standard Process for Data Mining (CRISP-DM) was followed to ensure a structured approach to data mining and machine learning.</p>
 
-## ML Business Case
+<h4>Source:</h4>
+<ul>
+    <li><a href="https://www.ibm.com/docs/it/spss-modeler/saas?topic=dm-crisp-help-overview">IBM - CRISP Overview</a></li>
+</ul>
 
-- In the previous bullet, you potentially visualised an ML task to answer a business requirement. You should frame the business case using the method we covered in the course.
+<h2 id="bugs">Bugs</h2>
+<h3>Fixed Bugs</h3>
+<p>None reported.</p>
 
-## Dashboard Design
+<h3>Unfixed Bugs</h3>
+<p>None reported.</p>
 
-- List all dashboard pages and their content, either blocks of information or widgets, like buttons, checkboxes, images, or any other items, that your dashboard library supports.
-- Finally, during the project development, you may revisit your dashboard plan to update a given feature (for example, at the beginning of the project, you were confident you would use a given plot to display an insight, but later, you chose another plot type).
+<h2 id="deployment">Deployment</h2>
+<p>The project is coded and hosted on GitHub and deployed using <a href="https://www.heroku.com/">Heroku</a>.</p>
 
-## Unfixed Bugs
+<h3>Creating the Heroku App</h3>
+<ol>
+    <li>Create a <code>requirements.txt</code> file in GitHub listing the project dependencies.</li>
+    <li>Set the <code>runtime.txt</code> to a supported Heroku-20 stack version.</li>
+    <li>Push the changes to GitHub and create a new app on Heroku.</li>
+    <li>Add <code>heroku/python</code> buildpack from the Settings tab.</li>
+    <li>From the Deploy tab, choose GitHub as the deployment method and connect to the repository.</li>
+    <li>Select the branch to deploy and click Deploy Branch.</li>
+    <li>Enable Automatic Deploys or deploy manually.</li>
+    <li>Wait for the app to be built and deployed.</li>
+    <li>Access the deployed app at <a href="https://your-projects-name.herokuapp.com/">https://your-projects-name.herokuapp.com/</a>.</li>
+</ol>
 
-- You will need to mention unfixed bugs and why they were unfixed. This section should include shortcomings of the frameworks or technologies used. Although time can be a significant variable for consideration, paucity of time and difficulty understanding implementation is not a valid reason to leave bugs unfixed.
+<h3>Forking the Repository</h3>
+<p>Instructions for forking the repository are available on GitHub.</p>
 
-## Deployment
+<h3>Making a Local Clone</h3>
+<p>Clone the repository to your local machine using <code>git clone</code>.</p>
 
-### Heroku
+<p><strong>You can find the live link to the site here:</strong> <a href="https://cherry-powdery-mildew-detector.herokuapp.com/">Cherry Powdery Mildew Detector</a></p>
 
-- The App live link is: `https://YOUR_APP_NAME.herokuapp.com/`
-- Set the runtime.txt Python version to a [Heroku-20](https://devcenter.heroku.com/articles/python-support#supported-runtimes) stack currently supported version.
-- The project was deployed to Heroku using the following steps.
+<h2 id="technologies-used">Technologies Used</h2>
 
-1. Log in to Heroku and create an App
-2. At the Deploy tab, select GitHub as the deployment method.
-3. Select your repository name and click Search. Once it is found, click Connect.
-4. Select the branch you want to deploy, then click Deploy Branch.
-5. The deployment process should happen smoothly if all deployment files are fully functional. Click the button Open App on the top of the page to access your App.
-6. If the slug size is too large, then add large files not required for the app to the .slugignore file.
+<h3>Platforms</h3>
+<ul>
+    <li><a href="https://www.heroku.com/">Heroku</a>: Used for deploying and running web applications.</li>
+    <li><a href="https://jupyter.org/">Jupyter Notebook</a>: Used for developing and running Python code.</li>
+    <li><a href="https://www.kaggle.com/">Kaggle</a>: Used for downloading datasets.</li>
+    <li><a href="https://github.com/">GitHub</a>: Used for code storage and version control.</li>
+    <li><a href="https://www.gitpod.io/">Gitpod</a>: Used for coding and committing to GitHub.</li>
+</ul>
 
-## Main Data Analysis and Machine Learning Libraries
+<h3>Languages</h3>
+<ul>
+    <li><a href="https://www.python.org/">Python</a>: The primary language used for developing the machine learning model and data analysis.</li>
+    <li><a href="https://en.wikipedia.org/wiki/Markdown">Markdown</a>: Used for creating the README file and documentation.</li>
+</ul>
 
-- Here, you should list the libraries used in the project and provide an example(s) of how you used these libraries.
+<h3>Main Data Analysis and Machine Learning Libraries</h3>
+<ul>
+    <li><a href="https://www.tensorflow.org/">TensorFlow</a>: For building and training the neural network.</li>
+    <li><a href="https://keras.io/">Keras</a>: High-level API for neural network creation.</li>
+    <li><a href="https://pandas.pydata.org/">Pandas</a>: For data manipulation and analysis.</li>
+    <li><a href="https://numpy.org/">NumPy</a>: For numerical operations.</li>
+    <li><a href="https://matplotlib.org/">Matplotlib</a>: For creating visualizations.</li>
+</ul>
 
-## Credits
-
-- In this section, you need to reference where you got your content, media and from where you got extra help. It is common practice to use code from other repositories and tutorials. However, it is necessary to be very specific about these sources to avoid plagiarism.
-- You can break the credits section up into Content and Media, depending on what you have included in your project.
-
-### Content
-
-- The text for the Home page was taken from Wikipedia Article A.
-- Instructions on how to implement form validation on the Sign-Up page were taken from [Specific YouTube Tutorial](https://www.youtube.com/).
-- The icons in the footer were taken from [Font Awesome](https://fontawesome.com/).
-
-### Media
-
-- The photos used on the home and sign-up page are from This Open-Source site.
-- The images used for the gallery page were taken from this other open-source site.
-
-## Acknowledgements (optional)
-
-- Thank the people who provided support throughout this project.
+<h2 id="credits">Credits</h2>
+<p>Special thanks to the contributors and data providers who made this project possible.</p>
