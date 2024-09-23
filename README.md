@@ -1,127 +1,223 @@
-<h2>Table of Contents</h2>
+# Cherry Leaf Disease Detection
 
-<a href="https://flower-2-466d9dcf9bb4.herokuapp.com/">Lived deployment here!</a>
-
-<ol>
-    <li><a href="#dataset-content">Dataset Content</a></li>
-    <li><a href="#business-requirements">Business Requirements</a></li>
-    <li><a href="#hypothesis-and-validation">Hypothesis and Validation</a></li>
-    <li><a href="#the-rationale-for-the-model">The Rationale for the Model</a></li>
-    <li><a href="#trial-and-error">Trial and Error</a></li>
-    <li><a href="#implementation-of-the-business-requirements">Implementation of the Business Requirements</a></li>
-    <li><a href="#ml-business-case">ML Business Case</a></li>
-    <li><a href="#dashboard-design-streamlit-app-user-interface">Dashboard Design</a></li>
-    <li><a href="#crisp-dm-process">CRISP-DM Process</a></li>
-    <li><a href="#bugs">Bugs</a></li>
-    <li><a href="#deployment">Deployment</a></li>
-    <li><a href="#technologies-used">Technologies Used</a></li>
-    <li><a href="#credits">Credits</a></li>
-</ol>
+1. [Cherry Leaf Disease Detection](#cherry-leaf-disease-detection)
+2. [Dataset Content](#dataset-content)  
+   - [Data Distribution and Dimensions](#data-distribution-and-dimensions)
+3. [Business Problem](#business-problem)  
+   - [Key Requirements](#key-requirements)
+4. [Hypotheses and Validation](#hypotheses-and-validation)  
+   - [Hypothesis 1: Infected Leaves Have Clear Visual Marks](#hypothesis-1-infected-leaves-have-clear-visual-marks)  
+   - [Hypothesis 2: Softmax Performs Better than Sigmoid for Output Activation](#hypothesis-2-softmax-performs-better-than-sigmoid-for-output-activation)  
+   - [Hypothesis 3: Converting RGB Images to Grayscale Improves Performance](#hypothesis-3-converting-rgb-images-to-grayscale-improves-performance)
+5. [Technical Considerations](#technical-considerations)
+6. [Experimental Results](#experimental-results)
+7. [Rationale for the Model](#rationale-for-the-model)  
+   - [Objective](#objective)  
+   - [Model Architecture and Hyperparameters](#model-architecture-and-hyperparameters)  
+   - [Hidden Layers and Their Functions](#hidden-layers-and-their-functions)  
+   - [References and Further Reading](#references-and-further-reading)
+8. [Implementation of the Business Requirements](#implementation-of-the-business-requirements)  
+   - [Business Requirement 1: Data Visualization](#business-requirement-1-data-visualization)  
+   - [Business Requirement 2: Classification](#business-requirement-2-classification)  
+   - [Business Requirement 3: Model Performance Report](#business-requirement-3-model-performance-report)
+9. [Dashboard Design (Streamlit App User Interface)](#dashboard-design-streamlit-app-user-interface)  
+   - [Page 1: Quick Project Summary](#page-1-quick-project-summary)  
+   - [Page 2: Leaves Visualizer](#page-2-leaves-visualizer)  
+   - [Page 3: Powdery Mildew Detector](#page-3-powdery-mildew-detector)  
+   - [Page 4: Project Hypothesis and Validation](#page-4-project-hypothesis-and-validation)  
+   - [Page 5: ML Performance Metrics](#page-5-ml-performance-metrics)
+10. [Implementation Details](#implementation-details)
+11. [CRISP-DM Process](#crisp-dm-process)
+12. [References](#references)
+13. [Manual Testing Report](#manual-testing-report)  
+   - [Test Cases](#test-cases)  
+     - [1. Image Upload and Processing](#1-image-upload-and-processing)  
+     - [2. Model Predictions](#2-model-predictions)  
+     - [3. Performance Metrics](#3-performance-metrics)  
+     - [4. Dashboard Functionality](#4-dashboard-functionality)
+14. [PEP8 Validation](#pep8-validation)
+15. [Bugs](#bugs)  
+   - [Fixed Bugs](#fixed-bugs)  
+   - [Unfixed Bugs](#unfixed-bugs)
+16. [Deployment](#deployment)  
+   - [Creating the Heroku App](#creating-the-heroku-app)  
+   - [Forking the Repository](#forking-the-repository)  
+   - [Making a Local Clone](#making-a-local-clone)
+17. [Technologies Used](#technologies-used)  
+   - [Platforms](#platforms)  
+   - [Languages](#languages)  
+   - [Main Data Analysis and Machine Learning Libraries](#main-data-analysis-and-machine-learning-libraries)
+18. [Credits](#credits)
 
 ## Dataset Content
 The dataset contains 4,208 featured photos of individual cherry leaves against a neutral background. The images are taken from the client's crop fields, showing leaves that are either healthy or infested by powdery mildew, a biotrophic fungus. This disease affects various plant species, but the client is particularly concerned about their cherry plantation crop, as bitter cherries are their flagship product. The dataset is sourced from Kaggle.
+
+### Data Distribution and Dimensions
+- **Healthy Leaves**: 420 images
+- **Infected Leaves**: 844 images
+- **Training Data**: 2,944 images
+
+The images are resized to 256x256 pixels. The dataset includes batches of images with dimensions:
+- **Batch Size**: 20
+- **Channels**: 3 (RGB)
 
 ## Business Problem
 **Client**: Farmy & Foods, a company in the agricultural sector.  
 **Goal**: Develop a machine learning system to automatically detect powdery mildew on cherry tree leaves using image-based analysis.  
 **Motivation**: Currently, the disease inspection process is manual, which is time-consuming and not scalable across the company’s multiple farms. Automating this process will save time and labor, allowing quicker interventions with fungicide treatments when necessary.
 
-### Key Requirements
-- The system must accurately detect whether a cherry tree leaf is healthy or infected by powdery mildew using an image of the leaf.
-- The solution should be fast enough for real-time use on mobile devices in the field.
-- A report should be generated based on the examined leaf images, indicating the health status of the cherry trees.
-
----
+## Key Requirements
+1. **Detection**: Accurately detect whether a cherry tree leaf is healthy or infected by powdery mildew using an image of the leaf.
+2. **Real-time Use**: Solution should be fast enough for real-time use on mobile devices in the field.
+3. **Report Generation**: A report should be generated based on the examined leaf images, indicating the health status of the cherry trees.
 
 ## Hypotheses and Validation
 
 ### Hypothesis 1: Infected Leaves Have Clear Visual Marks
-**Assumption**: Cherry leaves infected by powdery mildew show distinct visual signs, such as light-green circular lesions or white cotton-like growths, which can be detected by a machine learning model.
-
-**How to Validate**: A visual study of the images will be conducted to investigate if these marks consistently differentiate infected leaves from healthy ones. This will involve building image montages and calculating average variability between samples.
+- **Assumption**: Cherry leaves infected by powdery mildew show distinct visual signs, such as light-green circular lesions or white cotton-like growths.
+- **Validation**: A visual study of the images confirmed these visual markers, distinguishing infected leaves from healthy ones.
 
 ### Hypothesis 2: Softmax Performs Better than Sigmoid for Output Activation
-**Assumption**: For this classification problem, the softmax activation function will yield better results than the sigmoid function in the model’s output layer.
-
-**How to Validate**: Two identical models will be trained, one using softmax and the other sigmoid for the output layer. Performance will be evaluated by comparing accuracy, loss, and generalization capabilities on both training and validation sets.
+- **Assumption**: Softmax activation function will yield better results than sigmoid for the model’s output layer.
+- **Validation**: 
+  - **Softmax**: Demonstrated faster learning and better convergence. 
+  - **Sigmoid**: Exhibited slower learning with more overfitting.
+- **Conclusion**: Softmax outperformed sigmoid in this binary classification task.
 
 ### Hypothesis 3: Converting RGB Images to Grayscale Improves Performance
-**Assumption**: Grayscale images may reduce computational complexity and improve classification performance, assuming color information does not add significant value to distinguishing infected leaves from healthy ones.
-
-**How to Validate**: Train identical models on both RGB and grayscale images and compare their performance on key metrics such as training time, model accuracy, and overfitting.
-
----
+- **Assumption**: Grayscale images may reduce computational complexity and improve performance.
+- **Validation**: 
+  - **RGB Model**: Showed better accuracy and less overfitting compared to the grayscale model.
+  - **Grayscale Model**: Faster training but less accurate.
+- **Conclusion**: RGB images were more effective for distinguishing between healthy and infected leaves.
 
 ## Technical Considerations
 
 ### Image Preprocessing and Normalization
-When dealing with image datasets, normalization is crucial to ensure consistent results and improve the model’s generalization ability. Here’s a breakdown of the normalization process applied:
-
-1. **Normalizing Images**: Images are scaled so that their pixel values range between 0 and 1. This helps the neural network learn more efficiently, as smaller values speed up convergence and prevent large gradients during backpropagation.
-2. **Mean and Standard Deviation**: We calculate the mean and standard deviation of the dataset’s pixel values across the RGB channels (for RGB images) or grayscale intensity (for grayscale images). This ensures that the network can generalize across different test images. Due to memory constraints, the mean and standard deviation were computed batch by batch instead of loading the entire dataset into memory at once.
-
-**Example: Image Dimensions in the Dataset**  
-- **B**: Batch size — number of images processed at a time.  
-- **C**: Channels — 3 for RGB images or 1 for grayscale.  
-- **H**: Height — The pixel height of the image.  
-- **W**: Width — The pixel width of the image.
-
----
+- **Normalization**: Images were scaled to have pixel values between 0 and 1.
+- **Mean and Standard Deviation**: Calculated batch by batch to ensure proper normalization.
+- **Dimensions**:
+  - **Batch Size**: 20
+  - **Channels**: 3 (RGB)
 
 ## Experimental Results
 
-### Hypothesis 1: Infected Leaves Show Clear Visual Marks
+### Trial and Error
+- **Initial Attempts**:
+  - Early models struggled with pattern recognition; adjustments were made for learning rates and network depth.
+- **Tuning**:
+  - **Optimizer**: Adam was chosen for faster convergence.
+  - **Learning Rate**: Adjusted with a scheduler.
+  - **Data Augmentation**: Used to enhance model robustness.
 
-#### Observation
-After building montages and visualizing image differences between healthy and infected leaves, we observed that infected leaves generally exhibit white marks, especially toward the center. These marks are clear visual indicators that distinguish them from healthy leaves.  
-*Image Montage: Healthy vs. Infected Leaves* (Image to be added)
+### Final Results
+- **Training Accuracy**: 98.15%
+- **Validation Accuracy**: 99.52%
+- **Loss Function**: Validation loss reached as low as 0.0005, indicating successful learning.
 
-#### Conclusion
-The model successfully identified patterns in infected leaves, such as white stripes and lesions, to generalize across the dataset. This confirms the hypothesis that infected leaves have clear distinguishing features that a model can learn from.
+## Rationale for the Model
 
----
+1. **Objective**
+   - The primary objective is to develop a machine learning model capable of accurately classifying cherry leaves as either healthy or infected with powdery mildew. This involves building a Convolutional Neural Network (CNN) that can effectively learn and generalize features from images of cherry leaves to distinguish between the two classes.
 
-### Hypothesis 2: Softmax vs Sigmoid for Activation Function
+2. **Model Architecture and Hyperparameters**
+   - **Convolutional Layers**
+     - **Layer Sizes**: 32, 64, 64
+     - **Justification**: Increasing the number of filters progressively helps the network capture a hierarchy of features, from simple edges and textures to more complex patterns. This design balances computational efficiency with model complexity.
+   - **Kernel Size**: (3, 3)
+     - **Justification**: Commonly used for capturing local spatial patterns while maintaining spatial resolution and computational efficiency.
+   - **Fully Connected Layers**
+     - **Number of Neurons**: 128
+     - **Justification**: Balances model capacity with the risk of overfitting, capturing complex relationships while avoiding excessive overfitting.
+   - **Activation Functions**
+     - **Hidden Layers**: ReLU (Rectified Linear Unit)
+       - **Justification**: ReLU introduces non-linearity and helps with faster convergence during training.
+     - **Output Layer**: Sigmoid
+       - **Justification**: Sigmoid is suitable for binary classification, mapping the output to a probability value between 0 and 1.
+   - **Pooling Layers**
+     - **Pooling Type**: MaxPooling
+       - **Justification**: Retains prominent features while reducing spatial dimensions and computational load, introducing translation invariance.
+   - **Regularization**
+     - **Dropout Rate**: 0.5
+       - **Justification**: Helps prevent overfitting by randomly setting 50% of the neurons to zero during training.
 
-#### Observation
-We tested two identical convolutional neural networks (CNNs), one using softmax and the other sigmoid as the output layer activation function. Below are the key observations:
+3. **Hidden Layers and Their Functions**
+   - **Convolutional Layers**: For feature extraction, highlighting spatial hierarchies and patterns.
+   - **Fully Connected Layers**: For classification, interpreting high-level features to produce the final classification.
 
-- **Softmax**: Showed a faster learning rate and better convergence after the 5th epoch. There was a smaller generalization gap between training and validation accuracy, leading to better performance on unseen data.
-- **Sigmoid**: The model struggled with sharp gradients during backpropagation, leading to a slower learning process. It exhibited more overfitting after around 10 epochs.
+4. **References and Further Reading**
+   - How to choose the size of the convolution filter or Kernel size for CNN?
+   - The advantages of ReLU
+   - Maxpooling vs minpooling vs average pooling
+   - How ReLU and Dropout Layers Work in CNNs
 
-**Learning Curve Comparisons**  
-- *Softmax*: Showed a stable decrease in both training and validation loss.  
-  *Learning Curve: Softmax* (Image to be added)  
-- *Sigmoid*: Showed more oscillation and a wider gap between training and validation accuracy.  
-  *Learning Curve: Sigmoid* (Image to be added)
+## Implementation of the Business Requirements
 
-#### Conclusion
-The softmax function outperformed the sigmoid function in this case, making it more suitable for this binary classification task.
+### Business Requirement 1: Data Visualization
+- **User Story**: Visualize the data and understand the distribution of healthy and infected leaves.
+- **Implementation**: Data visualization included histograms, boxplots, and bar charts to explore the dataset. Images of both classes were displayed to observe visual differences.
+- **Tools Used**: Matplotlib, Seaborn, OpenCV, PIL
 
----
+### Business Requirement 2: Classification
+- **User Story**: Classify leaves as healthy or infected using the trained model.
+- **Implementation**: Utilized a CNN architecture with convolutional, pooling, and fully connected layers. Data augmentation techniques were applied.
+- **Outcome**: High classification accuracy with a validation accuracy of 98.15%.
 
-### Hypothesis 3: RGB vs Grayscale Image Performance
+### Business Requirement 3: Model Performance Report
+- **User Story**: Generate a report on model performance and predictions.
+- **Implementation**: Metrics such as accuracy, precision, recall, and F1-score were used. Confusion matrices were generated.
+- **Tools Used**: Scikit-learn, Matplotlib, Pandas
 
-#### Observation
-Models were trained on both RGB and grayscale versions of the dataset. The grayscale model required fewer parameters (3,714,658 vs 3,715,234), but the RGB model showed better performance:
+## Dashboard Design (Streamlit App User Interface)
 
-- **RGB Model**: More consistent accuracy and a smaller training/validation gap.  
-  *Learning Curve: RGB Model* (Image to be added)
-- **Grayscale Model**: Faster to train but exhibited more overfitting and less accuracy.  
-  *Learning Curve: Grayscale Model* (Image to be added)
+The dashboard provides an interactive interface for users to explore the cherry leaf disease detection system. It is designed to be user-friendly and informative. The dashboard is organized into several pages, each serving a specific purpose:
 
-#### Conclusion
-In this case, the RGB images contained more useful information for distinguishing between healthy and infected leaves, leading to better overall performance.
+### Page 1: Quick Project Summary
+- **Description**: Provides an overview of the project, including objectives, dataset details, and key findings.
+- **Features**:
+  - Brief introduction to the problem and solution.
+  - Summary of dataset characteristics and the business problem.
+  - Key results from the experiments and hypotheses.
 
----
+### Page 2: Leaves Visualizer
+- **Description**: Allows users to upload and visualize leaf images from the dataset.
+- **Features**:
+  - **Upload Functionality**: Users can upload images of cherry leaves.
+  - **Visualization**: Display of uploaded images with labels indicating whether they are healthy or infected.
+  - **Interactive Filters**: Options to view images based on health status (healthy/infected).
 
-## Conclusion
-The cherry leaf disease detection model was able to accurately classify healthy and infected leaves. Key findings include:
-- **Infected leaves exhibit distinct visual patterns**, making them identifiable with machine learning techniques.
-- **Softmax outperforms sigmoid** for the output activation function in this binary classification task.
-- **RGB images hold more valuable information than grayscale images** for this specific classification problem, even though grayscale reduces computational complexity.
+### Page 3: Powdery Mildew Detector
+- **Description**: Displays results from the model indicating whether a leaf is infected or not.
+- **Features**:
+  - **Image Upload**: Users can upload a leaf image to be analyzed.
+  - **Model Prediction**: The model processes the image and provides a prediction on whether the leaf is healthy or infected.
+  - **Confidence Score**: Displays the confidence score of the model's prediction.
+  - **Visualization**: Highlights the detected features on the image, such as lesions or growths.
 
----
+### Page 4: Project Hypothesis and Validation
+- **Description**: Summarizes the hypotheses tested and their validation results.
+- **Features**:
+  - **Hypothesis Overview**: Description of each hypothesis tested during the project.
+  - **Validation Results**: Visualization of results and conclusions drawn from the experiments.
+  - **Graphs and Charts**: Displays relevant plots such as learning curves and accuracy comparisons.
+
+### Page 5: ML Performance Metrics
+- **Description**: Shows the performance metrics of the trained model.
+- **Features**:
+  - **Accuracy Metrics**: Displays training and validation accuracy, precision, recall, and F1-score.
+  - **Confusion Matrix**: Visual representation of the model's performance across classes.
+  - **Learning Curves**: Plots showing training and validation loss and accuracy over epochs.
+
+## Implementation Details
+- **Tools Used**: Streamlit, Matplotlib, and Seaborn for visualizations; OpenCV for image processing.
+- **Interactive Features**: The dashboard allows users to interact with the model and view results in real-time, providing an intuitive way to understand the system’s performance and insights.
+
+<h4>Source:</h4>
+<ul>
+    <li><a href="https://www.ibm.com/docs/it/spss-modeler/saas?topic=dm-crisp-help-overview">IBM - CRISP Overview</a></li>
+</ul>
+## CRISP-DM Process
+The CRISP-DM (Cross-Industry Standard Process for Data Mining) methodology was followed for data understanding, preparation, modeling, evaluation, and deployment.
 
 ## References
 1. Pacific Northwest Pest Management Handbooks
@@ -130,110 +226,152 @@ The cherry leaf disease detection model was able to accurately classify healthy 
 4. Activation Functions Compared With Experiments by Sweta Shaw
 5. Backpropagation in Fully Convolutional Networks by Giuseppe Pio Cannata
 
-## Rationale for the Model
 
-### 1. **Objective**
+# Manual Testing Report
 
-The primary objective is to develop a machine learning model capable of accurately classifying cherry leaves as either healthy or infected with powdery mildew. This involves building a Convolutional Neural Network (CNN) that can effectively learn and generalize features from images of cherry leaves to distinguish between the two classes.
+## Overview
+This document summarizes the manual testing performed on the Cherry Leaf Disease Detection project. The testing focuses on ensuring that the Streamlit application functions as intended, from image upload and prediction to performance metrics display.
 
-### 2. **Model Architecture and Hyperparameters**
+## Test Cases
 
-#### **Convolutional Layers**
+### 1. Image Upload and Processing
 
-- **Layer Sizes**: 32, 64, 64
-  - **Justification**: The number of filters in each convolutional layer increases progressively. This design allows the network to capture a hierarchy of features: simple edges and textures in the early layers and more complex patterns in deeper layers. Starting with a smaller number of filters and increasing them helps balance computational efficiency with model complexity.
-
-- **Kernel Size**: (3, 3)
-  - **Justification**: The (3, 3) kernel size is commonly used in CNNs because it effectively captures local spatial patterns while maintaining a manageable number of parameters. Smaller kernels like (3, 3) help preserve spatial resolution and avoid excessive computational overhead compared to larger kernels.
-
-#### **Fully Connected Layers**
-
-- **Number of Neurons**: 128
-  - **Justification**: The fully connected layer with 128 neurons serves as the dense layer that interprets features extracted by convolutional layers and performs the final classification. The number of neurons is chosen to balance model capacity with the risk of overfitting. More neurons can capture more complex relationships but may lead to overfitting if not regularized properly.
-
-#### **Activation Functions**
-
-- **Hidden Layers**: ReLU (Rectified Linear Unit)
-  - **Justification**: ReLU activation function is used in hidden layers due to its ability to introduce non-linearity while mitigating the vanishing gradient problem. ReLU activates only a subset of neurons, leading to sparsity and faster convergence during training.
-
-- **Output Layer**: Sigmoid
-  - **Justification**: The sigmoid activation function is employed in the output layer for binary classification tasks. It maps the output to a probability value between 0 and 1, representing the likelihood of the leaf being infected. Although softmax is often preferred for multi-class problems, sigmoid is suitable here due to its simplicity in binary classification.
-
-#### **Pooling Layers**
-
-- **Pooling Type**: MaxPooling
-  - **Justification**: MaxPooling is used to downsample the feature maps while retaining the most prominent features. It reduces the spatial dimensions and computational load, and helps prevent overfitting by introducing a degree of translation invariance. MaxPooling is chosen over minpooling and average pooling for its superior performance in preserving essential features.
-
-#### **Regularization**
-
-- **Dropout Rate**: 0.5
-  - **Justification**: Dropout is applied with a rate of 0.5 to prevent overfitting by randomly setting 50% of the neurons to zero during training. This helps the network to generalize better by not relying too heavily on any individual neuron and encourages the learning of more robust features.
-
-### 3. **Hidden Layers and Their Functions**
-
-#### **Convolutional Layers**
-
-Convolutional layers are designed for feature extraction. They apply convolutional filters to the input image, creating feature maps that highlight spatial hierarchies and patterns. These layers are critical for detecting low-level features such as edges, textures, and patterns in the images.
-
-#### **Fully Connected Layers**
-
-Fully connected layers (dense layers) follow the convolutional layers and are responsible for classification. They take the high-level features extracted by the convolutional layers and combine them to produce the final classification. These layers aggregate and interpret the features into a decision boundary for classification.
-
-### 4. **References and Further Reading**
-
-- [How to choose the size of the convolution filter or Kernel size for CNN?](https://towardsdatascience.com/how-to-choose-the-size-of-the-convolution-filter-or-kernel-size-for-cnn-94f8f12fc4c4)
-- [The advantages of ReLU](https://www.analyticsvidhya.com/blog/2020/03/understanding-activation-functions-implementation/)
-- [Maxpooling vs minpooling vs average pooling](https://towardsdatascience.com/understanding-pooling-layers-98d28fc8da40)
-- [How ReLU and Dropout Layers Work in CNNs](https://medium.com/@a3b0c3/how-relu-and-dropout-layers-work-in-cnns-11d2ae35a6b1)
+#### 1.1 Upload Healthy Leaf Image
+- **Description**: Upload a healthy cherry leaf image.
+- **Expected Outcome**: Image should upload successfully, and the prediction should be "Healthy".
+- **Actual Outcome**: Image uploaded and classified as "Healthy". [Passed]
+- ![Healty leaf results](media/healthy_leaf.png)
 
 
+#### 1.2 Upload Infected Leaf Image
+- **Description**: Upload an infected cherry leaf image.
+- **Expected Outcome**: Image should upload successfully, and the prediction should be "Infected".
+- **Actual Outcome**: Image uploaded and classified as "Infected". [Passed]
+- ![Infected leaf results](media/powdery_mildew_leaf.png)
 
-<h2 id="trial-and-error">Trial and Error</h2>
-<p>The model was trained for 10 epochs, and its performance was monitored through accuracy and loss metrics. The model achieved high accuracy on both training and validation datasets, indicating a well-performing classification model.</p>
+#### 1.3 Upload Invalid File Format
+- **Description**: Upload a non-image file (e.g., `.txt` or `.pdf`).
+- **Expected Outcome**: The app should handle the invalid file gracefully and display an appropriate error message.
+- **Actual Outcome**: Error message displayed as expected. [Passed]
+- ![upload none img](media/none-img.png)
 
-<h2 id="implementation-of-the-business-requirements">Implementation of the Business Requirements</h2>
-<p>The business requirements were mapped into several user stories and translated into machine learning tasks. All tasks were manually tested and function as expected.</p>
+#### 1.4 Upload Corrupted Image
+- **Description**: Upload a corrupted image file.
+- **Expected Outcome**: The app should handle the corrupted file properly without crashing.
+ **Actual Outcome**: App handled the corrupted file gracefully. [Passed]
 
-<h3>Business Requirement 1: Data Visualization</h3>
-<p><strong>User Story:</strong> To visualize the data and understand the distribution of healthy and infected leaves.</p>
+#### 1.5 Upload Very Large or Small Image
+- **Description**: Upload images with extreme dimensions (very large or very small).
+- **Expected Outcome**: The app should resize the images correctly and process them without errors.
+- **Actual Outcome**: Images resized and processed correctly. [Passed]
+- ![resize img](media/resize-img.png)
 
-<h3>Business Requirement 2: Classification</h3>
-<p><strong>User Story:</strong> To classify leaves as healthy or infected using the trained model.</p>
+### 2. Model Predictions
 
-<h3>Business Requirement 3: Report</h3>
-<p><strong>User Story:</strong> To generate a report on model performance and predictions.</p>
+#### 2.1 Verify Predictions for Healthy Leaves
+- **Description**: Test the model's prediction for a variety of healthy leaves.
+- **Expected Outcome**: The model should predict "Healthy" for all healthy leaf images.
+- **Actual Outcome**: Predictions were accurate for all healthy leaves. [Passed]
+- ![prediction](media/analysis-flower.png)
 
-<h2 id="ml-business-case">ML Business Case</h2>
-<p>The model classifies cherry leaves as either healthy or infected with powdery mildew. It helps in identifying and managing the health of cherry trees more effectively.</p>
+#### 2.2 Verify Predictions for Infected Leaves
+- **Description**: Test the model's prediction for various infected leaves.
+- **Expected Outcome**: The model should predict "Infected" for all infected leaf images.
+- **Actual Outcome**: Predictions were accurate for all infected leaves. [Passed]
 
-<h2 id="dashboard-design-streamlit-app-user-interface">Dashboard Design (Streamlit App User Interface)</h2>
+### 3. Performance Metrics
 
-<h3>Page 1: Quick Project Summary</h3>
-<p>Provides an overview of the project and its objectives.</p>
+#### 3.1 Check Display of Accuracy, Precision, Recall, and F1-Score
+- **Description**: Verify that accuracy, precision, recall, and F1-score metrics are displayed correctly.
+- **Expected Outcome**: Metrics should be displayed as calculated by the model.
+- **Actual Outcome**: Metrics displayed correctly. [Passed]
+- ![prediction](media/avg_flower.png)
 
-<h3>Page 2: Leaves Visualizer</h3>
-<p>Allows users to upload and visualize leaf images.</p>
 
-<h3>Page 3: Powdery Mildew Detector</h3>
-<p>Displays results from the model indicating whether a leaf is infected or not.</p>
+#### 3.2 Check Confusion Matrix Visualization
+- **Description**: Verify that the confusion matrix is displayed correctly.
+- **Expected Outcome**: The confusion matrix should accurately reflect the model’s performance.
+- **Actual Outcome**: Confusion matrix displayed accurately. [Passed]
+- ![prediction](media/excel-flower.png)
 
-<h3>Page 4: Project Hypothesis and Validation</h3>
-<p>Summarizes the hypotheses tested and their validation results.</p>
 
-<h3>Page 5: ML Performance Metrics</h3>
-<p>Shows the performance metrics of the trained model.</p>
+### 4. Dashboard Functionality
 
-<h2 id="crisp-dm-process">CRISP-DM Process</h2>
-<p>The Cross-Industry Standard Process for Data Mining (CRISP-DM) was followed to ensure a structured approach to data mining and machine learning.</p>
+#### 4.1 Navigation and UI
+- **Description**: Test all navigation elements and UI components in the Streamlit app.
+- **Expected Outcome**: All tabs, buttons, and links should work correctly, and the UI should be responsive.
+- **Actual Outcome**: Navigation and UI components functioned as expected. [Passed]
+- ![UI](media/nav_flower.png)
 
-<h4>Source:</h4>
-<ul>
-    <li><a href="https://www.ibm.com/docs/it/spss-modeler/saas?topic=dm-crisp-help-overview">IBM - CRISP Overview</a></li>
-</ul>
+## Issues Encountered
+- **None**.
 
-<h2 id="bugs">Bugs</h2>
-<h3>Fixed Bugs</h3>
-<p>None reported.</p>
+## Conclusion
+The manual testing of the Cherry Leaf Disease Detection project confirms that the Streamlit application performs as expected across various test scenarios. All major functionalities, including image upload, model predictions, and performance metrics display, are working correctly.
+
+
+## PEP8 Validation 
+<details>
+
+* HomePage
+ <details>
+<summary> Multipage </summary>
+    <ul>
+        <li><img src="media/multipage-pep.png" alt="A screenshot of when the user use invalid input"></li>
+</details><br>
+* HomePage
+ <details>
+<summary> Mildew Detector </summary>
+    <ul>
+        <li><img src="media/detector-pep.png" alt="A screenshot of when the user use invalid input"></li>
+</details><br>
+* ML-Performance
+ <details>
+<summary> ML-Performance </summary>
+    <ul>
+        <li><img src="media/performance-pep.png" alt="A screenshot of when the user use invalid input"></li>
+</details><br>
+* Project hypothesis
+ <details>
+<summary> Project hypothesis </summary>
+    <ul>
+        <li><img src="media/hypo-pep.png" alt="A screenshot of when the user use invalid input"></li>
+</details><br>
+* Summery
+ <details>
+<summary> Summery </summary>
+    <ul>
+        <li><img src="media/summery-pep.png" alt="A screenshot of when the user use invalid input"></li>
+</details><br>
+* Evaluate
+ <details>
+<summary> Evaluate </summary>
+    <ul>
+        <li><img src="media/evaluate-pep.png" alt="A screenshot of when the user use invalid input"></li>
+</details><br>
+* Predictive Analysis
+ <details>
+<summary> Predictive Analysis </summary>
+    <ul>
+        <li><img src="media/predictive-pep.png" alt="A screenshot of when the user use invalid input"></li>
+</details><br>
+* Data_management.py
+ <details>
+<summary> Data management </summary>
+    <ul>
+        <li><img src="media/last-pep.png" alt="A screenshot of when the user use invalid input"></li>
+</details><br>
+
+
+
+### bugs
+
+![Bug img](media/pngtree-a-green-leaf-png-png-image_3984474.png)
+This is a new img of a leaf I took from the internet. We can clearly see that it's healty but still the model predict 79% chance infected with mildew. There are alot of parameters to think about when it comes to this img. First of all it looks like the leaf is not real and the all the shimmering details from the sun may confuse the model. 
+#### Fixed Bugs
+1. When I uploaded the project to heroku the slug was 534mb and the limit is 500. I put a few files in the .slugignore to make it down to 480mb. If you want to avoid this problem, change the img size from 254px x 254px to 127px x 127px.
+2. When I was about to upload the project to heroku I got a warning for Protobuff. The version wasn't compatible with my version of Django. So when I downgraded the Protobuff I got a "optimizer Adam" error when I tried to use the ML to search for mildew in a leaf. I deleted Protobuff and installed the same version one of my classmates used and after I loaded the module again it worked as expected.
+3. I had writed the code wrong in the predictive_analysis.py. I took images from the testing and tried the model. All the infected leafs was healthy and all the healthy leafs was infected accourding to the predictions. So I hade to find the error wich I found on line 17 and 56 in predictive_analysis.py where 0=Infected and 1=Healthy. 
 
 <h3>Unfixed Bugs</h3>
 <p>None reported.</p>

@@ -2,29 +2,29 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import os
 
-
 def page_project_hypothesis_body():
-    st.write("### Project Hypothesis and Validation")
+    st.write("### Project Hypotheses and Validation")
 
     st.success(
-        f"* We suspect that infected leafs and healthy leafs have clear marks/signs. \n\n"
-        f"* An image montage belov will show you what we found out about after the machine run through the dataset.\n"
-        f"* Belov the image montage we will also leave an explenation about what we found out and the clear signs we found")
-
-
-
-    st.write("#### Here is an analysis of average healthy leaf")
-
-    # Use the relative path, ensure the image is in the correct location
-    st.image('outputs/v1/avg_var_healthy.png', caption="Average healthy leaf\n")
-
-    st.write("#### Here is an analysis of average Powder mildew infected leaf")
-
-    # Use the relative path, ensure the image is in the correct location
-    st.image('outputs/v1/avg_var_powdery_mildew.png', caption="Average infected leaf\n\n")
-
-    st.success(
-        f" #### As we can see there is a diffrence between the healthy and infected leafs.\n"
-        f"* You can see it from the white lines on the black pictures\n"
-        f"* You can also see it in the green pictures that the white lines goes around the leaf on the healthy leaf while on the infected leaf the lines are more unpredictible."
+        f"* We hypothesized that infected leaves and healthy leaves would show clear visual signs of difference. \n\n"
+        f"* Below is an image montage that demonstrates the differences we found after running the machine learning model on the dataset.\n"
+        f"* Underneath the montage, we will explain the results and highlight the visual differences between healthy and infected leaves."
     )
+
+    st.write("#### Analysis of an Average Healthy Leaf")
+
+    # Ensure the image is in the correct location, and relative path is correct.
+    st.image('outputs/v1/avg_var_healthy.png', caption="Average Healthy Leaf")
+
+    st.write("#### Analysis of an Average Powdery Mildew Infected Leaf")
+
+    # Ensure the image is in the correct location, and relative path is correct.
+    st.image('outputs/v1/avg_var_powdery_mildew.png', caption="Average Infected Leaf")
+
+    st.success(
+        f"#### Observations\n"
+        f"* There is a noticeable difference between healthy and infected leaves.\n"
+        f"* On the black-background images, the white lines clearly outline the structure of a healthy leaf, while the lines are more erratic on an infected leaf.\n"
+        f"* In the green-background images, the white lines form a consistent pattern around healthy leaves, but are more irregular and dispersed on infected leaves."
+    )
+
