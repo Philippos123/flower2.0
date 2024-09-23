@@ -1,5 +1,5 @@
 # Cherry Leaf Disease Detection
-
+## [[Live version here!](https://flower-2-466d9dcf9bb4.herokuapp.com/)]
 1. [Cherry Leaf Disease Detection](#cherry-leaf-disease-detection)
 2. [Dataset Content](#dataset-content)  
    - [Data Distribution and Dimensions](#data-distribution-and-dimensions)
@@ -303,15 +303,12 @@ This document summarizes the manual testing performed on the Cherry Leaf Disease
 - **Actual Outcome**: Navigation and UI components functioned as expected. [Passed]
 - ![UI](media/nav_flower.png)
 
-## Issues Encountered
-- **None**.
 
 ## Conclusion
 The manual testing of the Cherry Leaf Disease Detection project confirms that the Streamlit application performs as expected across various test scenarios. All major functionalities, including image upload, model predictions, and performance metrics display, are working correctly.
 
 
 ## PEP8 Validation 
-<details>
 
 * HomePage
  <details>
