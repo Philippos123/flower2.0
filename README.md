@@ -424,4 +424,4 @@ This is a new img of a leaf I took from the internet. We can clearly see that it
 </ul>
 
 <h2 id="credits">Credits</h2>
-<p>Special thanks to the contributors and data providers who made this project possible.</p>
+<p>Special thanks to my mentor Mo for helping me!</p>
